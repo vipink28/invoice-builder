@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, getDocs, query, serverTimestamp, where } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
 import { createContext, useContext, useState } from "react";
 import { db } from "../firebaseConfig";
 
@@ -66,7 +66,8 @@ export const InvoiceProvider = ({ children }) => {
         },
         notes: "",
         ispaid: false,
-        partiallypaid: false
+        partiallypaid: false,
+        amountpaid: 0
     }
 
     const [invoice, setInvoice] = useState(invoiceInit);
@@ -149,7 +150,7 @@ export const InvoiceProvider = ({ children }) => {
     };
 
 
-    const updateCompany = async (user, companyId, updatedData) => {
+    const updateCompanyById = async (user, companyId, updatedData) => {
         if (!user) return;
         const companyRef = doc(db, "users", user.uid, "companies", companyId);
         await updateDoc(companyRef, updatedData);
@@ -187,10 +188,11 @@ export const InvoiceProvider = ({ children }) => {
             getCompanyById,
             getInvoiceById,
             getInvoices,
-            updateCompany,
+            updateCompanyById,
             updateInvoiceById,
             deleteCompany,
-            deleteInvoice
+            deleteInvoice,
+            saveCompanyIfNew
         }}>
             {children}
         </InvoiceContext.Provider>

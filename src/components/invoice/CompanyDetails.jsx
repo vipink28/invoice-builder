@@ -2,12 +2,14 @@ import { X } from "lucide-react"
 import { useContext, useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import countries from "world-countries"
+import { useAuth } from "../../auth/AuthContext"
 import InvoiceContext from "../../context/InvoiceContext"
 import Button from "../forms/Button"
 import InputField from "../forms/InputField"
 import SelectField from "../forms/SelectField"
 
-const CompanyDetails = ({ onClose, companyType, companyInfo, saveCompanyDetails }) => {
+const CompanyDetails = ({ onClose, companyType, companyInfo, saveCompanyDetails, newCompany }) => {
+    const { user } = useAuth();
     const { updateInvoice } = useContext(InvoiceContext);
     const init = {
         companyname: "",
@@ -43,7 +45,7 @@ const CompanyDetails = ({ onClose, companyType, companyInfo, saveCompanyDetails 
 
     return (
         <div className="fixed flex flex-col z-20 justify-center items-center top-0 left-0 w-full h-full bg-black/20">
-            <div className="bg-white w-full max-w-4xl p-5">
+            <div className="bg-white w-full max-w-4xl p-5 text-slate-950">
                 <div className="flex justify-end mb-4">
                     <button onClick={onClose} className="cursor-pointer p-2"><X className="w-4 h-4" /></button>
                 </div>
@@ -105,14 +107,21 @@ const CompanyDetails = ({ onClose, companyType, companyInfo, saveCompanyDetails 
                     </div>
                     <div className="flex gap-4">
                         <Button onClick={onClose}>Cancel</Button>
-                        <Button onClick={() => {
-                            toast.loading("Saving Company Details", { duration: 2000, })
-                            updateInvoice(companyType, formData)
-                            setTimeout(() => {
-                                saveCompanyDetails(formData)
-                                onClose()
-                            }, 2000)
-                        }} primary={true} icon="check">{`Set ${companyType} data`}</Button>
+                        {
+                            newCompany ?
+                                <Button onClick={() => saveCompanyDetails(formData, user)} primary={true} icon="check">{`Set ${companyType} Data`} </Button>
+                                :
+                                companyInfo?.id ?
+                                    <Button onClick={() => saveCompanyDetails(user, companyInfo.id, formData)} primary={true} icon="check">{`Update ${companyInfo.companyType} Data`} </Button> :
+                                    <Button onClick={() => {
+                                        toast.loading("Saving Company Details", { duration: 2000, })
+                                        updateInvoice(companyType, formData)
+                                        setTimeout(() => {
+                                            saveCompanyDetails(formData)
+                                            onClose()
+                                        }, 2000)
+                                    }} primary={true} icon="check">{`Set ${companyType} data`}</Button>
+                        }
                     </div>
                 </div>
             </div>

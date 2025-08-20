@@ -1,14 +1,17 @@
-import { ArrowUpDown, CheckCircle2, CircleDashed, Eye, Pencil, Trash, XCircle } from "lucide-react";
+import { ArrowUpDown, CheckCircle2, CircleDashed, Eye, Pencil, Trash, X, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { Link } from "react-router";
 import { useAuth } from "../auth/AuthContext";
+import Button from "../components/forms/Button";
+import InputField from "../components/forms/InputField";
 import InvoicePreview from "../components/invoice/InvoicePreview";
 import { useInvoice } from "../context/InvoiceContext";
 
 const MyInvoices = () => {
     const { user } = useAuth();
     const [preview, setPreview] = useState(false);
-    const { getInvoices } = useInvoice();
+    const { getInvoices, deleteInvoice, updateInvoiceById } = useInvoice();
     const [invoices, setInvoices] = useState([]);
     const [filteredInvoices, setFilteredInvoices] = useState([]);
     const [search, setSearch] = useState("");
@@ -16,7 +19,15 @@ const MyInvoices = () => {
     const [filter, setFilter] = useState("all");
     const [loading, setLoading] = useState(false);
     const [selectedInvoice, setSelectedInvoice] = useState(null)
-    const [confirmDialog, setConfirmDialog] = useState(false);
+    const [payment, setPayment] = useState(0);
+    const [confirmDialog, setConfirmDialog] = useState({
+        open: false,
+        type: "delete"
+    });
+
+    const handlePaymentInput = (e) => {
+        setPayment(e.target.value);
+    }
 
     const fetchInvoices = async (user) => {
         try {
@@ -30,6 +41,35 @@ const MyInvoices = () => {
             setLoading(false);
         }
     };
+
+    const deleteInvoiceById = async (user, id) => {
+        try {
+            await deleteInvoice(user, id);
+            setInvoices(prev => prev.filter(inv => inv.id !== id));
+            setConfirmDialog({ open: false })
+            toast.success("Invoice deleted")
+        } catch (error) {
+            console.log(error)
+            toast.error("Something went wrong")
+        }
+    }
+
+    const updateInvoicePaymentStatus = async (user, id, data) => {
+        try {
+            await updateInvoiceById(user, id, data);
+            setInvoices(prev =>
+                prev.map(inv =>
+                    inv.id === id ? { ...inv, ...data } : inv
+                )
+            );
+            setConfirmDialog({ open: false })
+            toast.success("Invoice Updated")
+        } catch (error) {
+            console.log(error)
+            toast.error("Something went wrong")
+        }
+    }
+
     useEffect(() => {
         if (user) {
             fetchInvoices(user)
@@ -52,9 +92,9 @@ const MyInvoices = () => {
         if (filter === "due") {
             data = data.filter((inv) => new Date(inv.invoiceheader.duedate) < today);
         } else if (filter === "isPaid") {
-            data = data.filter((inv) => inv.isPaid);
+            data = data.filter((inv) => inv.ispaid);
         } else if (filter === "partially") {
-            data = data.filter((inv) => inv.partialyPaid);
+            data = data.filter((inv) => inv.partiallypaid);
         } else if (filter === "dueSoon") {
             const twoDays = new Date();
             twoDays.setDate(today.getDate() + 2);
@@ -160,10 +200,16 @@ const MyInvoices = () => {
                                                     }}>
                                                         <Eye size={18} />
                                                     </button>
-                                                    <button className="text-green-600 hover:text-green-800">
+                                                    <button className="text-green-600 hover:text-green-800" onClick={() => {
+                                                        setSelectedInvoice(inv)
+                                                        setConfirmDialog({ open: true, type: "update" })
+                                                    }}>
                                                         <Pencil size={18} />
                                                     </button>
-                                                    <button className="text-red-600 hover:text-red-800">
+                                                    <button className="text-red-600 hover:text-red-800" onClick={() => {
+                                                        setSelectedInvoice(inv)
+                                                        setConfirmDialog({ open: true, type: "delete" })
+                                                    }}>
                                                         <Trash size={18} />
                                                     </button>
                                                 </td>
@@ -183,7 +229,32 @@ const MyInvoices = () => {
                 </div>
             </div>
             {
-
+                confirmDialog.open &&
+                <div className="fixed bg-black/30 w-screen h-screen left-0 top-0 flex flex-col justify-center items-center">
+                    <div className="bg-white w-full max-w-80 text-slate-950">
+                        {
+                            confirmDialog.type === "delete" ?
+                                <div className="p-4">
+                                    <p className="text-lg mb-5">Are you sure to delete?</p>
+                                    <div className="flex items-center gap-2">
+                                        <Button primary={true} onClick={() => deleteInvoiceById(user, selectedInvoice.id)}>Yes</Button>
+                                        <Button className="text-slate-950" onClick={() => setConfirmDialog({ open: false, type: "delete" })}>No</Button>
+                                    </div>
+                                </div>
+                                :
+                                <div className="pt-4 pb-8 px-4">
+                                    <div className="flex justify-end">
+                                        <button className="p-1" onClick={() => setConfirmDialog({ open: false, type: "delete" })}><X className="w-4 h-4" /></button>
+                                    </div>
+                                    <InputField type="number" name="amountpaid" label="Paid Amount" onChange={handlePaymentInput} />
+                                    <div className="flex items-center gap-2 mt-5">
+                                        <Button primary={true} className="w-full justify-center" onClick={() => updateInvoicePaymentStatus(user, selectedInvoice.id, { paidamount: payment, ispaid: true })}>Fully Paid</Button>
+                                        <Button className="text-slate-950 w-full justify-center" onClick={() => updateInvoicePaymentStatus(user, selectedInvoice.id, { paidamount: payment, partiallypaid: true })}>Partially Paid</Button>
+                                    </div>
+                                </div>
+                        }
+                    </div>
+                </div>
             }
             {
                 preview &&
