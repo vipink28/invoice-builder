@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
 export const createUserProfile = async (user) => {
@@ -16,4 +16,14 @@ export const createUserProfile = async (user) => {
             createdAt: new Date(),
         });
     }
+};
+
+export const updateUserProfile = async (uid, profileData) => {
+    if (!uid || !profileData) return;
+
+    const userRef = doc(db, "users", uid);
+    await updateDoc(userRef, {
+        ...profileData,
+        updatedAt: new Date(),
+    });
 };
