@@ -82,102 +82,172 @@ export const InvoiceProvider = ({ children }) => {
 
     const saveCompanyIfNew = async (company, user) => {
         if (!user || !company?.companyname) return;
+        try {
+            const companiesRef = collection(doc(db, "users", user.uid), "companies");
 
-        const companiesRef = collection(doc(db, "users", user.uid), "companies");
+            const q = query(
+                companiesRef,
+                where("companyname", "==", company.companyname),
+                where("taxnumber", "==", company.taxnumber)
+            );
+            const snapshot = await getDocs(q);
 
-
-        const q = query(
-            companiesRef,
-            where("companyname", "==", company.companyname),
-            where("taxnumber", "==", company.taxnumber)
-        );
-        const snapshot = await getDocs(q);
-
-        if (snapshot.empty) {
-            await addDoc(companiesRef, {
-                ...company,
-                userId: user.uid,
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp(),
-            });
+            if (snapshot.empty) {
+                await notifyPromise(
+                    addDoc(companiesRef, {
+                        ...company,
+                        userId: user.uid,
+                        createdAt: serverTimestamp(),
+                        updatedAt: serverTimestamp(),
+                    }),
+                    {
+                        loading: "Saving company...",
+                        success: "Company saved",
+                        error: "Failed to save company",
+                    }
+                );
+            }
+        } catch (err) {
+            notifyError(err.message);
         }
     };
 
 
     const getInvoices = async (user) => {
         if (!user) return [];
-        const invoicesRef = collection(db, "users", user.uid, "invoices");
-        const snapshot = await getDocs(invoicesRef);
-        return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        try {
+            const invoicesRef = collection(db, "users", user.uid, "invoices");
+            const snapshot = await getDocs(invoicesRef);
+            return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        } catch (err) {
+            notifyError("Failed to fetch invoices");
+            return [];
+        }
     };
 
 
     const getInvoiceById = async (user, invoiceId) => {
         if (!user) return null;
-        const invoiceRef = doc(db, "users", user.uid, "invoices", invoiceId);
-        const snapshot = await getDoc(invoiceRef);
-        return snapshot.exists() ? { id: snapshot.id, ...snapshot.data() } : null;
+        try {
+            const invoiceRef = doc(db, "users", user.uid, "invoices", invoiceId);
+            const snapshot = await getDoc(invoiceRef);
+            return snapshot.exists() ? { id: snapshot.id, ...snapshot.data() } : null;
+        } catch (err) {
+            notifyError("Failed to fetch invoice");
+            return null;
+        }
     };
 
 
     const updateInvoiceById = async (user, invoiceId, updatedData) => {
         if (!user) return;
-        const invoiceRef = doc(db, "users", user.uid, "invoices", invoiceId);
-        await updateDoc(invoiceRef, updatedData);
+        try {
+            const invoiceRef = doc(db, "users", user.uid, "invoices", invoiceId);
+            await notifyPromise(updateDoc(invoiceRef, updatedData), {
+                loading: "Updating invoice...",
+                success: "Invoice updated",
+                error: "Failed to update invoice",
+            });
+        } catch (err) {
+            notifyError(err.message);
+        }
     };
 
 
     const deleteInvoice = async (user, invoiceId) => {
         if (!user) return;
-        const invoiceRef = doc(db, "users", user.uid, "invoices", invoiceId);
-        await deleteDoc(invoiceRef);
+        try {
+            await notifyPromise(
+                deleteDoc(doc(db, "users", user.uid, "invoices", invoiceId)),
+                {
+                    loading: "Deleting invoice...",
+                    success: "Invoice deleted",
+                    error: "Failed to delete invoice",
+                }
+            );
+        } catch (err) {
+            notifyError(err.message);
+        }
     };
 
 
 
     const getCompanies = async (user) => {
         if (!user) return [];
-        const companiesRef = collection(db, "users", user.uid, "companies");
-        const snapshot = await getDocs(companiesRef);
-        return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        try {
+            const companiesRef = collection(db, "users", user.uid, "companies");
+            const snapshot = await getDocs(companiesRef);
+            return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        } catch (err) {
+            notifyError("Failed to fetch companies");
+            return [];
+        }
     };
 
 
     const getCompanyById = async (user, companyId) => {
         if (!user) return null;
-        const companyRef = doc(db, "users", user.uid, "companies", companyId);
-        const snapshot = await getDoc(companyRef);
-        return snapshot.exists() ? { id: snapshot.id, ...snapshot.data() } : null;
+        try {
+            const companyRef = doc(db, "users", user.uid, "companies", companyId);
+            const snapshot = await getDoc(companyRef);
+            return snapshot.exists() ? { id: snapshot.id, ...snapshot.data() } : null;
+        } catch (err) {
+            notifyError("Failed to fetch company");
+            return null;
+        }
     };
 
 
     const updateCompanyById = async (user, companyId, updatedData) => {
         if (!user) return;
-        const companyRef = doc(db, "users", user.uid, "companies", companyId);
-        await updateDoc(companyRef, updatedData);
+        try {
+            const companyRef = doc(db, "users", user.uid, "companies", companyId);
+            await notifyPromise(updateDoc(companyRef, updatedData), {
+                loading: "Updating company...",
+                success: "Company updated",
+                error: "Failed to update company",
+            });
+        } catch (err) {
+            notifyError(err.message);
+        }
     };
 
 
     const deleteCompany = async (user, companyId) => {
         if (!user) return;
-        const companyRef = doc(db, "users", user.uid, "companies", companyId);
-        await deleteDoc(companyRef);
+        try {
+            const companyRef = doc(db, "users", user.uid, "companies", companyId);
+            await notifyPromise(deleteDoc(companyRef), {
+                loading: "Deleting company...",
+                success: "Company deleted",
+                error: "Failed to delete company",
+            });
+        } catch (err) {
+            notifyError(err.message);
+        }
     };
 
     const saveInvoice = async (invoice, user) => {
         if (!user) return;
+        try {
+            const promise = addDoc(collection(doc(db, "users", user.uid), "invoices"), {
+                ...invoice,
+                userId: user.uid,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+            }).then(async () => {
+                await saveCompanyIfNew(invoice.sender, user);
+                await saveCompanyIfNew(invoice.recipient, user);
+            });
 
-        const invoicesRef = collection(doc(db, "users", user.uid), "invoices");
-
-        await addDoc(invoicesRef, {
-            ...invoice,
-            userId: user.uid,
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
-        });
-
-        await saveCompanyIfNew(invoice.sender, user);
-        await saveCompanyIfNew(invoice.recipient, user);
+            await notifyPromise(promise, {
+                loading: "Saving invoice...",
+                success: "Invoice saved successfully",
+                error: "Failed to save invoice",
+            });
+        } catch (err) {
+            notifyError(err.message);
+        }
     };
 
 

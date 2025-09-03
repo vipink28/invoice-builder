@@ -48,31 +48,76 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const signup = async (email, password, fullName) => {
-        const { user } = await createUserWithEmailAndPassword(auth, email, password);
-        await updateProfile(user, { displayName: fullName });
-        await createUserProfile({ ...user, displayName: fullName });
+        try {
+            const promise = createUserWithEmailAndPassword(auth, email, password)
+                .then(async ({ user }) => {
+                    await updateProfile(user, { displayName: fullName });
+                    await createUserProfile({ ...user, displayName: fullName });
+                    const profile = await fetchUserProfile(user.uid);
+                    setUser({ uid: user.uid, email: user.email, ...profile });
+                    return user;
+                });
 
-        const profile = await fetchUserProfile(user.uid);
-        setUser({ uid: user.uid, email: user.email, ...profile });
-        return user;
+            return await notifyPromise(promise, {
+                loading: "Creating account...",
+                success: "Account created successfully",
+                error: "Signup failed",
+            });
+        } catch (err) {
+            notifyError(err.message);
+        }
     };
 
     const signin = async (email, password) => {
-        const { user } = await signInWithEmailAndPassword(auth, email, password);
-        const profile = await fetchUserProfile(user.uid);
-        setUser({ uid: user.uid, email: user.email, ...profile });
-        return user;
+        try {
+            const promise = signInWithEmailAndPassword(auth, email, password).then(
+                async ({ user }) => {
+                    const profile = await fetchUserProfile(user.uid);
+                    setUser({ uid: user.uid, email: user.email, ...profile });
+                    return user;
+                }
+            );
+
+            return await notifyPromise(promise, {
+                loading: "Signing in...",
+                success: "Signed in successfully",
+                error: "Login failed",
+            });
+        } catch (err) {
+            notifyError(err.message);
+        }
     };
 
     const signinWithGoogle = async () => {
-        const { user } = await signInWithPopup(auth, googleProvider);
-        await createUserProfile(user);
-        const profile = await fetchUserProfile(user.uid);
-        setUser({ uid: user.uid, email: user.email, ...profile });
-        return user;
+        try {
+            const promise = signInWithPopup(auth, googleProvider).then(async ({ user }) => {
+                await createUserProfile(user);
+                const profile = await fetchUserProfile(user.uid);
+                setUser({ uid: user.uid, email: user.email, ...profile });
+                return user;
+            });
+
+            return await notifyPromise(promise, {
+                loading: "Signing in with Google...",
+                success: "Welcome back",
+                error: "Google login failed",
+            });
+        } catch (err) {
+            notifyError(err.message);
+        }
     };
 
-    const logout = () => signOut(auth);
+    const logout = async () => {
+        try {
+            await notifyPromise(signOut(auth), {
+                loading: "Logging out...",
+                success: "Logged out successfully",
+                error: "Logout failed",
+            });
+        } catch (err) {
+            notifyError(err.message);
+        }
+    };
 
 
     if (loading) {
