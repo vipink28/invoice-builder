@@ -27,6 +27,13 @@ export const AuthProvider = ({ children }) => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             if (currentUser) {
                 const profile = await fetchUserProfile(currentUser.uid);
+                try {
+                    await updateDoc(doc(db, "users", currentUser.uid), {
+                        lastLogin: serverTimestamp()
+                    });
+                } catch (err) {
+
+                }
                 setUser({
                     uid: currentUser.uid,
                     email: currentUser.email,

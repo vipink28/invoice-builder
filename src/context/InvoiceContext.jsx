@@ -96,6 +96,7 @@ export const InvoiceProvider = ({ children }) => {
         if (snapshot.empty) {
             await addDoc(companiesRef, {
                 ...company,
+                userId: user.uid,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp(),
             });
@@ -170,6 +171,7 @@ export const InvoiceProvider = ({ children }) => {
 
         await addDoc(invoicesRef, {
             ...invoice,
+            userId: user.uid,
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
         });
