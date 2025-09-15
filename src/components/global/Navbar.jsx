@@ -30,7 +30,7 @@ const Navbar = () => {
                 <div className="flex items-center justify-between">
                     <Link to="/" className="font-bold text-xl">Invoice Builder</Link>
                     <div className="flex items-center py-2">
-                        <PrimaryMenu />
+                        <PrimaryMenu user={user} />
                         {
                             user &&
                             <div ref={dropdownMenuRef} className="relative">
@@ -42,7 +42,7 @@ const Navbar = () => {
                                 {
                                     dropdown &&
                                     <div className="absolute flex flex-col w-52 right-0 top-14 bg-slate-900 px-3">
-                                        <NavLink onClick={() => setDropdown(false)} to="/profile" className={({ isActive }) =>
+                                        <NavLink onClick={() => setDropdown(false)} to={user.role === "admin" ? "/admin/profile" : "/profile"} className={({ isActive }) =>
                                             `py-2 px-4 font-semibold hover:text-white flex border-b w-full border-slate-400 items-center ${isActive ? "text-white" : "text-slate-200"}`
                                         }><UserPen className="w-4 h-4 me-2" /> Profile</NavLink>
                                         <button onClick={logout} className="py-2 px-4 cursor-pointer font-semibold hover:text-white flex items-center">
