@@ -14,8 +14,14 @@ const SignIn = () => {
 
     const handleSubmit = async () => {
         try {
-            await signin(formData.email, formData.password);
-            navigate("/my-invoices");
+            const user = await signin(formData.email, formData.password);
+            debugger
+            if (user.role === "admin") {
+                navigate("/admin");
+            } else {
+                navigate("/my-invoices");
+            }
+
         } catch (error) {
             console.error("Signin error:", error.message);
         }

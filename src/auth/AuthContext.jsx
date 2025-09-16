@@ -8,6 +8,7 @@ import {
 } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { createContext, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import LoadingFullScreen from "../components/global/LoadingFullScreen";
 import { auth, db, googleProvider } from "../firebaseConfig";
 import { createUserProfile } from "../helper/apiMethods";
@@ -18,6 +19,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     const fetchUserProfile = async (uid) => {
         const docRef = doc(db, "users", uid);
@@ -57,7 +59,7 @@ export const AuthProvider = ({ children }) => {
                     await createUserProfile({ ...user, displayName: fullName });
                     const profile = await fetchUserProfile(user.uid);
                     setUser({ uid: user.uid, email: user.email, ...profile });
-                    return user;
+                    return profile;
                 });
 
             return await notifyPromise(promise, {
@@ -76,7 +78,7 @@ export const AuthProvider = ({ children }) => {
                 async ({ user }) => {
                     const profile = await fetchUserProfile(user.uid);
                     setUser({ uid: user.uid, email: user.email, ...profile });
-                    return user;
+                    return profile;
                 }
             );
 
@@ -96,7 +98,7 @@ export const AuthProvider = ({ children }) => {
                 await createUserProfile(user);
                 const profile = await fetchUserProfile(user.uid);
                 setUser({ uid: user.uid, email: user.email, ...profile });
-                return user;
+                return profile;
             });
 
             return await notifyPromise(promise, {
@@ -116,6 +118,7 @@ export const AuthProvider = ({ children }) => {
                 success: "Logged out successfully",
                 error: "Logout failed",
             });
+            navigate("/");
         } catch (err) {
             notifyError(err.message);
         }
