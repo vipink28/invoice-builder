@@ -46,7 +46,7 @@ const AppRouter = () => {
                             <Route path="users" element={<Users />}></Route>
                             <Route path="user/:userid/invoices" element={<Invoices />}></Route>
                             <Route path="user/:userid/companies" element={<Companies />}></Route>
-                            <Route path="user/:userid/user-details/:id" element={<UserDetails />}></Route>
+                            <Route path="user/:type/:userid" element={<UserDetails />}></Route>
                             <Route path="user/:userid/invoice-details/:id" element={<InvoiceDetails />}></Route>
                             <Route path="user/:userid/company-details/:id" element={<CompanyDetails />}></Route>
                             <Route path="profile" element={<Profile />}></Route>

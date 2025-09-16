@@ -87,7 +87,6 @@ const MyInvoices = () => {
             );
         }
 
-
         const today = new Date();
         if (filter === "due") {
             data = data.filter((inv) => new Date(inv.invoiceheader.duedate) < today);

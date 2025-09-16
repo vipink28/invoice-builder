@@ -8,6 +8,7 @@ import {
 } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { createContext, useContext, useEffect, useState } from "react";
+import LoadingFullScreen from "../components/global/LoadingFullScreen";
 import { auth, db, googleProvider } from "../firebaseConfig";
 import { createUserProfile } from "../helper/apiMethods";
 import { notifyError, notifyPromise } from "../helper/toastutils";
@@ -123,9 +124,7 @@ export const AuthProvider = ({ children }) => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-slate-900">
-                <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-            </div>
+            <LoadingFullScreen />
         );
     }
 
