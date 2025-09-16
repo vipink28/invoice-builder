@@ -24,33 +24,42 @@ const AppRouter = () => {
     return (
         <>
             {
-                user &&
-                    user.role === "user" ?
+                user ?
+                    <>
+                        {
+                            user.role === "user" ?
+                                <Routes>
+                                    <Route path="/" element={<MainLayout />}>
+                                        <Route path="my-invoices" element={<ProtectedRoute><MyInvoices /></ProtectedRoute>}></Route>
+                                        <Route path="companies" element={<ProtectedRoute><Companies /></ProtectedRoute>}></Route>
+                                        <Route path="create-invoice" element={<ProtectedRoute><CreateInvoice /></ProtectedRoute>}></Route>
+                                        <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>}></Route>
+                                        <Route path="*" element={<PageNotFound />}></Route>
+                                    </Route>
+                                </Routes>
+                                :
+                                <Routes>
+                                    <Route path="/" element={<Navigate to="/admin" />}></Route>
+                                    <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+                                        <Route index element={<Dashboard />}></Route>
+                                        <Route path="users" element={<Users />}></Route>
+                                        <Route path="user/:userid/invoices" element={<Invoices />}></Route>
+                                        <Route path="user/:userid/companies" element={<Companies />}></Route>
+                                        <Route path="user/:type/:userid" element={<UserDetails />}></Route>
+                                        <Route path="user/:userid/invoice-details/:id" element={<InvoiceDetails />}></Route>
+                                        <Route path="user/:userid/company-details/:id" element={<CompanyDetails />}></Route>
+                                        <Route path="profile" element={<Profile />}></Route>
+                                        <Route path="*" element={<PageNotFound />}></Route>
+                                    </Route>
+                                </Routes>
+                        }
+                    </>
+                    :
                     <Routes>
                         <Route path="/" element={<MainLayout />}>
                             <Route index element={<Home />}></Route>
                             <Route path="signup" element={<SignUp />}></Route>
                             <Route path="signin" element={<SignIn />}></Route>
-                            <Route path="my-invoices" element={<ProtectedRoute><MyInvoices /></ProtectedRoute>}></Route>
-                            <Route path="companies" element={<ProtectedRoute><Companies /></ProtectedRoute>}></Route>
-                            <Route path="create-invoice" element={<ProtectedRoute><CreateInvoice /></ProtectedRoute>}></Route>
-                            <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>}></Route>
-                            <Route path="*" element={<PageNotFound />}></Route>
-                        </Route>
-                    </Routes>
-                    :
-                    <Routes>
-                        <Route path="/" element={<Navigate to="/admin" />}></Route>
-                        <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
-                            <Route index element={<Dashboard />}></Route>
-                            <Route path="users" element={<Users />}></Route>
-                            <Route path="user/:userid/invoices" element={<Invoices />}></Route>
-                            <Route path="user/:userid/companies" element={<Companies />}></Route>
-                            <Route path="user/:type/:userid" element={<UserDetails />}></Route>
-                            <Route path="user/:userid/invoice-details/:id" element={<InvoiceDetails />}></Route>
-                            <Route path="user/:userid/company-details/:id" element={<CompanyDetails />}></Route>
-                            <Route path="profile" element={<Profile />}></Route>
-                            <Route path="*" element={<PageNotFound />}></Route>
                         </Route>
                     </Routes>
             }
