@@ -22,7 +22,7 @@
 - npm (comes with Node) or yarn
 - A Firebase account
 
-> **Note:** The project uses a Vite-style dev script (`npm run dev`). If your project uses Create React App, the commands may be `npm start` instead. This README assumes `npm run dev` as requested.
+> **Note:** The project uses a Vite-style dev script (`npm run dev`).
 
 ---
 
