@@ -1,21 +1,23 @@
 import { ArrowUpDown, Eye, Pencil, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { useAuth } from "../../auth/AuthContext";
 import { formatFirestoreTimestamp } from "../../helper";
 import { getAllUsers } from "../../helper/apiMethods";
 
 const Users = () => {
+    const { user } = useAuth();
     const [users, setUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [search, setSearch] = useState("");
     const [sortAsc, setSortAsc] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [newUser, setNewUser] = useState(false);
+
     const fetchUsers = async () => {
         try {
             setLoading(true);
             const list = await getAllUsers();
-            console.log(list);
+
             setUsers(list);
             setFilteredUsers(list);
             setLoading(false);
@@ -30,8 +32,8 @@ const Users = () => {
     }, [])
 
     useEffect(() => {
-        let data = [...users];
-
+        let data = users.filter((u) => u.userId !== user.userId);
+        console.log(data)
         // search
         if (search.trim()) {
             const s = search.toLowerCase();

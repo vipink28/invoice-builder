@@ -1,12 +1,11 @@
 import { Navigate, Route, Routes } from "react-router"
-import CompanyDetails from "../admin/pages/CompanyDetails"
+import AdminCompanies from "../admin/pages/Companies"
 import Dashboard from "../admin/pages/Dashboard"
 import Invoices from "../admin/pages/Invoices"
 import UserDetails from "../admin/pages/UserDetails"
 import Users from "../admin/pages/Users"
 import { useAuth } from "../auth/AuthContext"
 import ProtectedRoute from "../auth/ProtectedRoute"
-import InvoiceDetails from "../components/invoice/InvoiceDetails"
 import AdminLayout from "../layout/AdminLayout"
 import MainLayout from "../layout/MainLayout"
 import Companies from "../pages/Companies"
@@ -20,7 +19,6 @@ import SignUp from "../pages/SignUp"
 
 const AppRouter = () => {
     const { user } = useAuth();
-
     return (
         <>
             {
@@ -44,10 +42,9 @@ const AppRouter = () => {
                                         <Route index element={<Dashboard />}></Route>
                                         <Route path="users" element={<Users />}></Route>
                                         <Route path="user/:userid/invoices" element={<Invoices />}></Route>
-                                        <Route path="user/:userid/companies" element={<Companies />}></Route>
+                                        <Route path="user/:userid/companies" element={<AdminCompanies />}></Route>
                                         <Route path="user/:type/:userid" element={<UserDetails />}></Route>
-                                        <Route path="user/:userid/invoice-details/:id" element={<InvoiceDetails />}></Route>
-                                        <Route path="user/:userid/company-details/:id" element={<CompanyDetails />}></Route>
+
                                         <Route path="profile" element={<Profile />}></Route>
                                         <Route path="*" element={<PageNotFound />}></Route>
                                     </Route>

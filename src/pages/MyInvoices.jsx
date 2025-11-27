@@ -78,7 +78,6 @@ const MyInvoices = () => {
 
     useEffect(() => {
         let data = [...invoices];
-
         if (search.trim()) {
             data = data.filter(
                 (inv) =>
@@ -247,8 +246,8 @@ const MyInvoices = () => {
                                     </div>
                                     <InputField type="number" name="amountpaid" label="Paid Amount" onChange={handlePaymentInput} />
                                     <div className="flex items-center gap-2 mt-5">
-                                        <Button primary={true} className="w-full justify-center" onClick={() => updateInvoicePaymentStatus(user, selectedInvoice.id, { paidamount: payment, ispaid: true })}>Fully Paid</Button>
-                                        <Button className="text-slate-950 w-full justify-center" onClick={() => updateInvoicePaymentStatus(user, selectedInvoice.id, { paidamount: payment, partiallypaid: true })}>Partially Paid</Button>
+                                        <Button primary={true} className="w-full justify-center" onClick={() => updateInvoicePaymentStatus(user, selectedInvoice.id, { amountpaid: payment, ispaid: true })}>Fully Paid</Button>
+                                        <Button className="text-slate-950 w-full justify-center" onClick={() => updateInvoicePaymentStatus(user, selectedInvoice.id, { amountpaid: payment, partiallypaid: true })}>Partially Paid</Button>
                                     </div>
                                 </div>
                         }

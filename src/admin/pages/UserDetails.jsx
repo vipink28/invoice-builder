@@ -80,8 +80,8 @@ const UserDetails = () => {
         <Container>
             <div className="py-4 flex items-center gap-4">
                 <Link to="/admin/users" className="inline-flex py-2 ps-2 pe-3 rounded-md items-center gap-3 font-medium border border-gray-300"><ArrowLeft className="w-4 h-4" /> Back to User List</Link>
-                <Link to="/admin/users" className="inline-flex py-2 ps-2 pe-3 rounded-md items-center gap-3 font-medium border border-gray-300 ms-auto"><NotepadText className="w-4 h-4" /> Invoices List</Link>
-                <Link to="/admin/users" className="inline-flex py-2 ps-2 pe-3 rounded-md items-center gap-3 font-medium border border-gray-300"><Building className="w-4 h-4" /> Companies List</Link>
+                <Link to={`/admin/user/${userid}/invoices`} className="inline-flex py-2 ps-2 pe-3 rounded-md items-center gap-3 font-medium border border-gray-300 ms-auto"><NotepadText className="w-4 h-4" /> Invoices List</Link>
+                <Link to={`/admin/user/${userid}/companies`} className="inline-flex py-2 ps-2 pe-3 rounded-md items-center gap-3 font-medium border border-gray-300"><Building className="w-4 h-4" /> Companies List</Link>
             </div>
 
             <div className="grid grid-cols-3 gap-5">
